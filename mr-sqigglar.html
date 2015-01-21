@@ -1,0 +1,65 @@
+<head>
+  <title>Mr Sqigglar</title>
+</head>
+
+<body>
+  <div class="container" style="margin-right: auto; margin-left: auto;">
+    {{>main}}
+  </div><!-- /.container -->
+</body>
+
+<template name="main">
+  <div class="header">
+    <nav>
+      <ul class="nav nav-pills pull-right">
+        {{#if game}}
+        <li role="presentation" class="{{#if hostMode}}active{{/if}}">
+          <a href="#" data-action="host-mode">Host</a>
+        </li>
+        <li role="presentation" class="{{#if playMode}}active{{/if}}">
+          <a href="#" data-action="play-mode">Play</a>
+        </li>
+        {{/if}}
+        <li role="presentation">
+          <a href="#" class="btn btn-danger" data-action="new-game">New</a>
+        </li>
+      </ul>
+    </nav>
+    <h3 class="text-muted">Mr. Squigglar</h3>
+  </div>
+  {{#if hostMode}}
+    {{> hostView}}
+  {{/if}}
+  {{#if playMode}}
+    {{> sketchView}}
+  {{/if}}
+</template>
+
+<template name="hostView">
+  <div class="row">
+    <div class="col-sm-4">
+      <h3>Squiggle</h3>
+      <img src="/squiggle_01.jpg" class="img-thumbnail">
+    </div>
+    <div class="col-sm-8">
+      <h3>Submitted</h3>
+      <div class="row">
+        {{#each submitted}}
+        <div class="col-xs-6 col-md-3">
+          <div class="thumbnail" style="background-image: {{imageUrl}}; background-repeat: no-repeat; background-position: center, center; background-size: contain;">
+            <img src="{{emptyImage}}">
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="sketchView">
+  <h2>Sketching</h2>
+  <canvas class="sketch-canvas" width="600" height="800" style="background-image: {{imageUrl}}; background-repeat: no-repeat; background-position: center, center;">
+  </canvas>
+  <button data-action="send">Send</button>
+  <button data-action="clear">Clear</button>
+</template>
