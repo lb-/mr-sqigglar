@@ -7,6 +7,13 @@ if (Meteor.isClient) {
     return emptyImage;
   });
 
+  Template.registerHelper('momo', function(aDate) {
+    if (_.isDate(aDate)) {
+      return moment(aDate).fromNow();
+    }
+    return '';
+  });
+
   Template.registerHelper('game', function () {
     var game = Session.get('game');
     return game;
@@ -31,16 +38,25 @@ if (Meteor.isClient) {
     },
     'click [data-action="new-game"]': function (event) {
       event.preventDefault();
-      Session.set('mode', null);
       Meteor.call('newGame', function (error, result) {
         if (error) {
-          console.log(error);
+          throw error;
         } else {
           console.log('game set to: ', result);
           Session.set('game', result);
+          Session.set('mode', 'play');
         }
       });
     },
+    'click [data-action="select-game"]': function (event) {
+      event.preventDefault();
+      Session.set('game', this._id);
+      Session.set('mode', 'play');
+    },
+    'click [data-action="go-home"]': function (event) {
+      event.preventDefault();
+      Session.set('mode', null);
+    }
   });
 
   Template.main.helpers({
@@ -56,6 +72,10 @@ if (Meteor.isClient) {
       var mode = Session.get('mode');
       return mode === 'host';
     },
+    games: function () {
+      var games = Games.find({}, { sort: {started: -1} }).fetch();
+      return games;
+    },
   });
 
   Template.sketchView.rendered = function () {
@@ -66,6 +86,20 @@ if (Meteor.isClient) {
     'click [data-action="send"]': function (event, template) {
       var sketch = $(template.find(".sketch-canvas")).sketch();
       var dataUrl = sketch.el.toDataURL();
+      var gameId = Session.get('game');
+      var $button = $(template.find('[data-action="send"]'));
+      $button.attr('disabled', 'disabled');
+      $button.toggleClass('btn-primary');
+      $button.text("Sending...")
+      Meteor.call('addSketch', gameId, dataUrl, function (error, result) {
+        if (error) {
+          throw error;
+        } else {
+          $button.text("Send")
+          $button.removeAttr('disabled');
+          $button.toggleClass('btn-primary');
+        }
+      });
       console.log(dataUrl);
     },
     'click [data-action="clear"]': function (event, template) {
@@ -73,35 +107,61 @@ if (Meteor.isClient) {
     },
   });
 
-  Template.sketchView.helpers({
-    imageUrl: function () {
-      var squiggleUrl = "/squiggle_01.jpg";
-      var drawing = Session.get('drawing');
-      if (drawing) {
-        return "url(" + x +"), url(" + squiggleUrl + ")";
-      }
-      return "url(" + squiggleUrl + ")";
-    },
+  Template.registerHelper('imageUrl', function() {
+    var gameId = Session.get('game');
+    var game = Games.findOne({_id: gameId});
+    if (game) {
+      var squiggleUrl = game.imageUrl;
+      return squiggleUrl;
+    }
+    return;
   });
 
   Template.hostView.helpers({
     submitted: function () {
-      return [
-        {imageUrl: "url(" + x + ") ,url(/squiggle_01.jpg)"},
-      ];
+      var gameId = Session.get('game');
+      var game = Games.findOne({_id: gameId});
+      var results = [];
+      if (game) {
+        _.each(game.squiggles, function (squiggle) {
+          results.push({
+            backgroundUrl: "url(" + squiggle + "), url(" + game.imageUrl + ")"
+          });
+        });
+      }
+      return results;
     },
   });
 
 }
 
 if (Meteor.isServer) {
+  chance = Chance();
   Meteor.methods({
     newGame: function () {
+      var now = moment();
       //if there are more than 10 games, remove the oldest
-      //find a random squiggle url
+      var doc = {
+        //find a random squiggle url
+        name: chance.name(),
+        started: now.toDate(),
+        imageUrl: "/squiggle_" + chance.integer({min: 1, max: 16}) + ".jpg",
+        squiggles: [],
+      };
       //create a new game
+      var newGameId = Games.insert(doc);
       //return the game ID
-      return 'abc123';
+      return newGameId;
+    },
+    addSketch: function (gameId, sketchDataUrl) {
+      //var game = Games.findOne({_id: gameId});
+      var updated = Games.update(
+        {_id: gameId},
+        {
+          $push: {squiggles: sketchDataUrl}
+        }
+      );
+      return updated;
     },
   });
 }
