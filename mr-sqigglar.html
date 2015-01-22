@@ -57,11 +57,17 @@
 
 <template name="hostView">
   <div class="row">
-    <div class="col-sm-4">
+    <div class="col-sm-6">
       <h3>Squiggle</h3>
+      <div class="thumbnail" style="background-image: {{compBackgroundUrl}}; background-repeat: no-repeat; background-position: center, center; background-size: contain;">
+        <img src="{{emptyImage}}">
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <h3>Original</h3>
       <img src="{{imageUrl}}" class="img-thumbnail">
     </div>
-    <div class="col-sm-8">
+    <!-- <div class="col-sm-8">
       <h3>Submitted</h3>
       <div class="row">
         {{#each submitted}}
@@ -72,7 +78,7 @@
         </div>
         {{/each}}
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 

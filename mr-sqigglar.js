@@ -118,19 +118,32 @@ if (Meteor.isClient) {
   });
 
   Template.hostView.helpers({
-    submitted: function () {
+    compBackgroundUrl: function () {
       var gameId = Session.get('game');
       var game = Games.findOne({_id: gameId});
-      var results = [];
+      var lastImage = " url(" + game.imageUrl + ")";
+      var result = '';
       if (game) {
         _.each(game.squiggles, function (squiggle) {
-          results.push({
-            backgroundUrl: "url(" + squiggle + "), url(" + game.imageUrl + ")"
-          });
+          result += "url(" + squiggle + "), ";
         });
       }
-      return results;
+      result += lastImage;
+      return result;
     },
+    // submitted: function () {
+    //   var gameId = Session.get('game');
+    //   var game = Games.findOne({_id: gameId});
+    //   var results = [];
+    //   if (game) {
+    //     _.each(game.squiggles, function (squiggle) {
+    //       results.push({
+    //         backgroundUrl: "url(" + squiggle + "), url(" + game.imageUrl + ")"
+    //       });
+    //     });
+    //   }
+    //   return results;
+    // },
   });
 
 }
