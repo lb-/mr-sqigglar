@@ -25,7 +25,7 @@
         {{/if}}
       </ul>
     </nav>
-    <h3 class="text-muted">Mr. Squigglar</h3>
+    <h3 class="text-muted">Mr. Squigglar <small>{{absoluteUrl}}</small></h3>
   </div>
   {{#if hostMode}}
     {{> hostView}}
@@ -36,13 +36,18 @@
   {{#unless modeSelected}}
     <div class="row">
       <div class="col-lg-12">
-        <h2>Join Game</h2>
+        <h2>Play</h2>
+        <a href="#" class="btn btn-primary btn-block" data-action="play-mode">
+          Play (Join current game)
+        </a>
+        <h2>Start Game</h2>
+        <a href="#" class="btn btn-warning btn-block" data-action="new-game">
+          New Game <small>Starts a new game for everyone</small>
+        </a>
+        <h2>Past Games</h2>
         <div class="list-group">
-          <a href="#" class="list-group-item list-group-item-warning" data-action="new-game">
-            New Game
-          </a>
           {{#each games}}
-          <a href="#" class="list-group-item" data-action="select-game">
+          <a href="#" class="list-group-item">
             {{name}}
             <span class="badge">
               {{momo started}}
@@ -94,7 +99,7 @@
   </div>
   <div class="row">
     <div class="col-lg-12">
-      <div class="thumbnail">
+      <div class="thumbnail" style="width: 610px; margin-left: auto; margin-right: auto;">
         <canvas class="sketch-canvas" width="600" height="800" style="background-image: url({{imageUrl}}); background-repeat: no-repeat; background-position: center, center;">
         </canvas>
       </div>
