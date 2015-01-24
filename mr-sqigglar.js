@@ -5,7 +5,7 @@ if (Meteor.isClient) {
   Tracker.autorun(function () {
     var games = Games.find({}, { sort: {started: -1} }).fetch();
     console.log('autorun', games);
-    if (games) {
+    if (! _.isEmpty(games)) {
       var newestGameId = games[0]._id;
       console.log('new game started', newestGameId);
       Session.set('game', newestGameId);
@@ -15,6 +15,10 @@ if (Meteor.isClient) {
 
   Template.registerHelper('emptyImage', function () {
     return emptyImage;
+  });
+
+  Template.registerHelper('absoluteUrl', function () {
+    return Meteor.absoluteUrl();
   });
 
   Template.registerHelper('momo', function(aDate) {
